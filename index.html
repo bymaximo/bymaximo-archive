@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ByMaximo Archive</title>
+<style>
+@font-face {
+    font-family: 'PerfectDOS';
+    src: url('PerfectDOS.ttf') format('truetype');
+}
+body {
+    margin: 0;
+    height: 100vh;
+    background: url('fondo.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'PerfectDOS', monospace;
+    font-weight: 400;
+    overflow: hidden;
+    color: white;
+}
+
+/* Papelera */
+.trash {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-align: center;
+    width: 40px;
+}
+.trash img { width: 32px; height: 32px; }
+.trash span { display: block; margin-top: 5px; font-size: 9px; font-weight: 400; }
+
+/* Columna de iconos */
+.desktop {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+}
+.icon { width: 40px; text-align: center; cursor: pointer; }
+.icon img { width: 32px; height: 32px; }
+.icon span { display: block; margin-top: 5px; font-size: 9px; font-weight: 400; text-align: center; }
+
+/* Logo central */
+.logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: blink 1s infinite; }
+.logo img { width: 120px; height: auto; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+/* Ventanas estilo Win98 */
+.window {
+    position: absolute;
+    width: 300px;
+    background: #C0C0C0;
+    border: 2px solid #000;
+    box-shadow: 2px 2px #808080;
+    display: none;
+    font-family: 'PerfectDOS', monospace;
+    font-weight: 400;
+    z-index: 100;
+}
+.window-header {
+    background: #080484;
+    color: white;
+    padding: 2px 5px;
+    font-size: 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+}
+.window-header span { font-weight: 400; }
+.close-btn { cursor: pointer; font-weight: bold; }
+.window-content { padding: 10px; }
+.file {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    cursor: pointer;
+}
+.file img { width: 24px; height: 24px; }
+.file span { font-size: 9px; font-weight: 400; }
+
+/* Reproductor estilo Win98 */
+#player {
+    position: absolute;
+    width: 320px;
+    background: #C0C0C0;
+    border: 2px solid #000;
+    display: none;
+    box-shadow: 2px 2px #808080;
+    font-weight: 400;
+}
+#player-header {
+    background: #080484;
+    color: white;
+    padding: 2px 5px;
+    font-size: 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+}
+#player-header span { font-weight: 400; }
+#player-content { padding: 10px; text-align: center; }
+#track-title { color: black; margin: 0 0 5px 0; font-size: 9px; font-weight: 400; }
+.controls button { font-family:'PerfectDOS'; font-size:9px; font-weight:400; width:30px; height:20px; cursor:pointer; }
+
+/* Barra de tareas */
+.taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: #C0C0C0;
+    border-top: 2px solid #000;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    box-sizing: border-box;
+    box-shadow: inset 0 2px #fff;
+    justify-content: space-between;
+}
+.taskbar-left { display: flex; align-items: center; gap: 5px; }
+.taskbar-left img { width: 20px; height: 20px; cursor: pointer; }
+.start-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'PerfectDOS', monospace;
+    font-size: 9px;
+    font-weight: 400;
+    padding: 2px 5px;
+    cursor: pointer;
+    border: 2px solid #fff;
+    background: #C0C0C0;
+    color: black;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #fff;
+}
+.start-btn img.start-icon { width: 16px; height: 16px; }
+.start-btn:focus { outline: none; }
+.taskbar-right { font-size: 9px; color: black; font-weight: 400; margin-right: 10px; }
+
+/* Tiempo del reproductor */
+.time-display { display:flex; justify-content:space-between; width:90%; margin:0 auto; font-size:8px; color:black; }
+</style>
+</head>
+<body>
+
+<div class="trash"><img src="papelera.png" alt="Papelera"><span>Papelera</span></div>
+
+<div class="desktop">
+    <div class="icon"><img src="mipc.png" alt="Mi PC"><span>Mi PC</span></div>
+    <div class="icon" onclick="openWindow('track_1_window')"><img src="carpeta.png"><span>track_1</span></div>
+    <div class="icon" onclick="openWindow('track_2_window')"><img src="carpeta.png"><span>track_2</span></div>
+    <div class="icon" onclick="openWindow('track_3_window')"><img src="carpeta.png"><span>track_3</span></div>
+    <div class="icon" onclick="openWindow('track_4_window')"><img src="carpeta.png"><span>track_4</span></div>
+    <div class="icon" onclick="openWindow('track_5_window')"><img src="carpeta.png"><span>track_5</span></div>
+</div>
+
+<!-- Ventanas de carpetas -->
+<div id="track_1_window" class="window">
+    <div class="window-header"><span>track_1</span><span class="close-btn" onclick="closeWindow('track_1_window')">X</span></div>
+    <div class="window-content"><div class="file" onclick="playFile('track_1.mp3','track_1')"><img src="archivo.png"><span>track_1.wav</span></div></div>
+</div>
+<div id="track_2_window" class="window">
+    <div class="window-header"><span>track_2</span><span class="close-btn" onclick="closeWindow('track_2_window')">X</span></div>
+    <div class="window-content"><div class="file" onclick="playFile('track_2.mp3','track_2')"><img src="archivo.png"><span>track_2.wav</span></div></div>
+</div>
+<div id="track_3_window" class="window">
+    <div class="window-header"><span>track_3</span><span class="close-btn" onclick="closeWindow('track_3_window')">X</span></div>
+    <div class="window-content"><div class="file" onclick="playFile('track_3.mp3','track_3')"><img src="archivo.png"><span>track_3.wav</span></div></div>
+</div>
+<div id="track_4_window" class="window">
+    <div class="window-header"><span>track_4</span><span class="close-btn" onclick="closeWindow('track_4_window')">X</span></div>
+    <div class="window-content"><div class="file" onclick="playFile('track_4.mp3','track_4')"><img src="archivo.png"><span>track_4.wav</span></div></div>
+</div>
+<div id="track_5_window" class="window">
+    <div class="window-header"><span>track_5</span><span class="close-btn" onclick="closeWindow('track_5_window')">X</span></div>
+    <div class="window-content"><div class="file" onclick="playFile('track_5.mp3','track_5')"><img src="archivo.png"><span>track_5.wav</span></div></div>
+</div>
+
+<!-- Reproductor estilo Win98 con tiempo -->
+<div id="player" class="window">
+  <div class="window-header"><span>Reproductor</span><span class="close-btn" onclick="closePlayer()">X</span></div>
+  <div class="window-content" style="text-align:center;">
+    <p id="track-title">track_1</p>
+    <div class="controls" style="display:flex;justify-content:center;gap:5px;margin:5px 0;">
+      <button onclick="playAudio()">▶</button>
+      <button onclick="pauseAudio()">⏸</button>
+      <button onclick="stopAudio()">■</button>
+    </div>
+    <div class="progress-bar" style="width:90%;height:10px;background:#808080;margin:5px auto;position:relative;">
+      <div id="progress" style="width:0%;height:100%;background:#00ff00;"></div>
+    </div>
+    <div class="time-display">
+      <span id="current-time">0:00</span>
+      <span id="remaining-time">0:00</span>
+    </div>
+  </div>
+</div>
+<audio id="audio" src=""></audio>
+
+<div class="logo"><img src="logo.png" alt="Mi Logo"></div>
+
+<div class="taskbar">
+    <div class="taskbar-left">
+        <button class="start-btn"><img src="inicio.png" class="start-icon">Inicio</button>
+        <img src="cable.png"><img src="music.png">
+    </div>
+    <div class="taskbar-right" id="clock"></div>
+</div>
+
+<script>
+// Reloj
+function updateClock(){
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2,'0');
+    const minutes = now.getMinutes().toString().padStart(2,'0');
+    const day = now.getDate().toString().padStart(2,'0');
+    const month = (now.getMonth()+1).toString().padStart(2,'0');
+    const year = now.getFullYear();
+    document.getElementById('clock').innerText = `${hours}:${minutes} ${day}/${month}/${year}`;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// Ventanas y reproductor
+const audio = document.getElementById('audio');
+const progress = document.getElementById('progress');
+const trackTitle = document.getElementById('track-title');
+const currentTimeEl = document.getElementById('current-time');
+const remainingTimeEl = document.getElementById('remaining-time');
+
+function openWindow(id){
+    const win = document.getElementById(id);
+    win.style.display='block';
+    win.style.top = (window.innerHeight/2 - win.offsetHeight/2)+'px';
+    win.style.left = (window.innerWidth/2 - win.offsetWidth/2)+'px';
+    dragElement(win);
+}
+function closeWindow(id){ document.getElementById(id).style.display='none'; }
+
+function playFile(file,title){
+    audio.src=file;
+    trackTitle.innerText=title + ".mp3";
+    audio.play();
+    const player=document.getElementById('player');
+    player.style.display='block';
+    player.style.top=(window.innerHeight/2 - player.offsetHeight/2)+'px';
+    player.style.left=(window.innerWidth/2 - player.offsetWidth/2)+'px';
+    dragElement(player);
+}
+function playAudio(){ audio.play(); }
+function pauseAudio(){ audio.pause(); }
+function stopAudio(){ audio.pause(); audio.currentTime=0; updateProgress(); }
+
+audio.addEventListener('timeupdate', updateProgress);
+function updateProgress(){
+    const percent=(audio.currentTime/audio.duration*100)||0;
+    progress.style.width=percent+'%';
+    const cur=Math.floor(audio.currentTime);
+    const rem=Math.floor(audio.duration-audio.currentTime);
+    currentTimeEl.innerText=`${Math.floor(cur/60)}:${String(cur%60).padStart(2,'0')}`;
+    remainingTimeEl.innerText=`-${Math.floor(rem/60)}:${String(rem%60).padStart(2,'0')}`;
+}
+function closePlayer(){ document.getElementById('player').style.display='none'; audio.pause(); }
+
+// Arrastrar ventanas
+function dragElement(elmnt){
+  let pos1=0,pos2=0,pos3=0,pos4=0;
+  const header=elmnt.querySelector(".window-header");
+  if(header){ header.onmousedown=dragMouseDown; }
+  function dragMouseDown(e){ e.preventDefault(); pos3=e.clientX; pos4=e.clientY; document.onmouseup=closeDragElement; document.onmousemove=elementDrag; }
+  function elementDrag(e){ e.preventDefault(); pos1=pos3-e.clientX; pos2=pos4-e.clientY; pos3=e.clientX; pos4=e.clientY; elmnt.style.top=(elmnt.offsetTop-pos2)+'px'; elmnt.style.left=(elmnt.offsetLeft-pos1)+'px'; }
+  function closeDragElement(){ document.onmouseup=null; document.onmousemove=null; }
+}
+</script>
+</body>
+</html>
+
